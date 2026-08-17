@@ -3,42 +3,64 @@
  * https://developers.cloudflare.com/workers/wrangler/configuration/
  */
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "flue-bot-traffic",
-	"main": "src/index.ts",
-	"compatibility_date": "2026-08-10",
-	"assets": {
-		"binding": "ASSETS",
-		"directory": "./public"
-	},
-	"observability": {
-		"enabled": true
-	},
-	"upload_source_maps": true,
-	"compatibility_flags": [
-		"nodejs_compat"
-	]
-	/**
-	 * Smart Placement
-	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
-	 */
-	// "placement": {  "mode": "smart" }
-	/**
-	 * Bindings
-	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
-	 * databases, object storage, AI inference, real-time communication and more.
-	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
-	 */
-	/**
-	 * Environment Variables
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
-	 * Note: Use secrets to store sensitive data.
-	 * https://developers.cloudflare.com/workers/configuration/secrets/
-	 */
-	// "vars": {  "MY_VARIABLE": "production_value" }
-	/**
-	 * Service Bindings (communicate between multiple Workers)
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
-	 */
-	// "services": [  {   "binding": "MY_SERVICE",   "service": "my-service"  } ]
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "flue-bot-traffic",
+  "compatibility_date": "2026-08-11",
+  "vars": {
+    "TEAM_DOMAIN": "",
+    "POLICY_AUD": "",
+    "OPERATOR_ALLOWED_ORIGINS": "",
+  },
+  "send_email": [
+    {
+      "name": "EMAIL",
+    },
+  ],
+  /**
+   * NOTE: No `addresses` entry is declared here. The approval Reply-To uses
+   * plus addressing (`approve+<token>@<zone-report-domain>`), which a literal
+   * `approve@<zone-report-domain>` routing rule would NOT capture. Inbound
+   * Email Routing to this Worker's `email()` handler is external onboarding:
+   * the operator must configure a catch-all or plus-address routing rule for
+   * each registered zone's report domain in the Email Routing dashboard.
+   */
+  "triggers": {
+    "crons": ["0 4 * * *", "0 5 * * 1", "0 6 * * *"],
+  },
+  "r2_buckets": [
+    {
+      "binding": "BOT_TRAFFIC_ANALYTICS",
+      "bucket_name": "flue-bot-traffic-analytics",
+      "preview_bucket_name": "flue-bot-traffic-analytics-preview",
+    },
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "flue-bot-traffic-registry",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "ai": {
+    "binding": "AI",
+  },
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./public",
+    "run_worker_first": ["/health", "/agents/*", "/operator/*"],
+  },
+  "observability": {
+    "enabled": true,
+    "traces": {
+      "enabled": true,
+    },
+  },
+  "upload_source_maps": true,
+  "compatibility_flags": ["nodejs_compat"],
+  "migrations": [
+    {
+      "tag": "flue-class-FlueZoneBotAnalystAgent",
+      "new_sqlite_classes": ["FlueZoneBotAnalystAgent"],
+    },
+  ],
 }

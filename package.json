@@ -1,16 +1,70 @@
 {
   "name": "flue-bot-traffic",
+  "author": "Harshil Agrawal",
+  "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+    "dev": "vite dev",
+    "build": "vite build",
+    "deploy": "npm run db:migrations:apply && vite build && wrangler deploy --minify",
+    "db:migrations:apply": "wrangler d1 migrations apply DB --remote",
+    "setup": "npm run build && wrangler deploy --minify && npm run db:migrations:apply",
+    "check": "tsc --noEmit && vite build",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "cf-typegen:check": "wrangler types --env-interface CloudflareBindings --check",
+    "test": "vitest run"
   },
   "dependencies": {
-    "hono": "^4.13.1"
+    "@flue/runtime": "^2.0.3",
+    "valibot": "^1.4.2",
+    "hono": "^4.13.1",
+    "jose": "^6.2.8",
+    "postal-mime": "^2.7.6"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.51.2",
+    "wrangler": "^4.120.0",
+    "@flue/vite": "^2.0.3",
     "@types/node": "^26.2.0",
-    "wrangler": "^4.120.0"
+    "typescript": "^7.0.2",
+    "vite": "^8.2.1",
+    "vitest": "^4.1.10"
+  },
+  "cloudflare": {
+    "bindings": {
+      "DB": {
+        "description": "D1 registry for zones and operator audit records. It is provisioned automatically and migrated during deployment."
+      },
+      "BOT_TRAFFIC_ANALYTICS": {
+        "description": "R2 bucket containing zone-keyed traffic rollups and monitoring outcomes."
+      },
+      "TEAM_DOMAIN": {
+        "description": "Your Cloudflare Access team domain, for example `https://your-team.cloudflareaccess.com`."
+      },
+      "POLICY_AUD": {
+        "description": "The AUD tag for the Cloudflare Access application protecting this Worker."
+      },
+      "OPERATOR_ALLOWED_ORIGINS": {
+        "description": "Optional comma-separated browser origins allowed to submit rollback confirmations. Empty defaults to same-origin only."
+      },
+      "APPROVAL_TOKEN_SECRET": {
+        "description": "A long random secret used to sign single-use email approval tokens. Generate one with `openssl rand -hex 32`."
+      },
+      "WAF_WRITE_TOKEN": {
+        "description": "Optional account API token for guarded WAF rule writes. Leave unset for an initial read-only deployment."
+      },
+      "CLOUDFLARE_ANALYTICS_TOKEN": {
+        "description": "Read-only Cloudflare API token used by scheduled GraphQL analytics collection."
+      },
+      "CLOUDFLARE_MCP_TOKEN": {
+        "description": "Optional read-only Cloudflare token for the model-facing MCP connection."
+      },
+      "AGENT_ACCESS_TOKEN": {
+        "description": "Optional additional bearer token protecting the agent route behind Cloudflare Access."
+      }
+    }
   }
 }
