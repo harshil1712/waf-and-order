@@ -1,0 +1,157 @@
+.github/workflows/ci.yml
+  s_9adc5ae1d7c5ea::t_1d4b9f5fd48c58 1-21
+.nvmrc
+  s_9adc5ae1d7c5ea::t_c8ab4729ed925a 1
+CONTRIBUTING.md
+  s_9adc5ae1d7c5ea::t_11f697b7ec2050 1-23
+README.md
+  s_9adc5ae1d7c5ea::t_63de884764d061 1-45,48-57,61-213,215-249,251-257,260-265,267-268,270-296
+SECURITY.md
+  s_9adc5ae1d7c5ea::t_c2caed2261aedc 1-11
+flue.config.ts
+  s_9adc5ae1d7c5ea::t_d4adaa65064d7b 1-8
+package-lock.json
+  s_b43f0b61db89dd::t_e0acd2b42f0a0d 2-7295
+public/index.html
+  s_9adc5ae1d7c5ea::t_67e99f8456faef 6-120,123-140
+src/analytics/backfill.ts
+  s_9adc5ae1d7c5ea::t_631aced263ca33 1-79
+src/analytics/collector.ts
+  s_9adc5ae1d7c5ea::t_4741cb78e0ffbc 1-220
+src/analytics/dimensions.ts
+  s_9adc5ae1d7c5ea::t_a1fbcc5ecffc7b 1-34
+src/analytics/monitor.ts
+  s_9adc5ae1d7c5ea::t_67e8a5ffe281da 1-499
+src/analytics/outcome-storage.ts
+  s_9adc5ae1d7c5ea::t_e6c84cc2dccea3 1-128
+src/analytics/reader.ts
+  s_9adc5ae1d7c5ea::t_bad3e9910925e5 1-48
+src/analytics/sanitization.ts
+  s_9adc5ae1d7c5ea::t_89949b44aceb95 1-43
+src/analytics/storage.ts
+  s_9adc5ae1d7c5ea::t_c33aa1c43c5a4a 1-131
+src/cloudflare/apply-io.ts
+  s_9adc5ae1d7c5ea::t_fd384a562c735e 1-153
+src/cloudflare/rollback.ts
+  s_9adc5ae1d7c5ea::t_e784d8d858f85e 1-198
+src/cloudflare/rulesets.ts
+  s_9adc5ae1d7c5ea::t_59e9cace89c150 1-147
+src/email/inbound.ts
+  s_9adc5ae1d7c5ea::t_511adb81a5f2bc 1-175
+src/email/sender.ts
+  s_9adc5ae1d7c5ea::t_f1308e494241d7 1-141
+src/shared/apply-parser.ts
+  s_9adc5ae1d7c5ea::t_6a5750ccf61668 1-72
+src/shared/apply-policy.ts
+  s_9adc5ae1d7c5ea::t_e13fd0a13e8388 1-316
+src/shared/apply-state.ts
+  s_9adc5ae1d7c5ea::t_fab33ba1fc5d1d 1-161
+src/shared/auto-reply.ts
+  s_9adc5ae1d7c5ea::t_b056ac2f90dc57 1-127
+src/shared/canonical.ts
+  s_9adc5ae1d7c5ea::t_ab8887917501e5 1-38
+src/shared/dates.ts
+  s_9adc5ae1d7c5ea::t_24b2cfa1ac5c3e 1-11
+src/shared/envelope.ts
+  s_9adc5ae1d7c5ea::t_8d60d1b53bd84e 1-40
+src/shared/monitor-endday.ts
+  s_9adc5ae1d7c5ea::t_26401b80d8b7fa 1-45
+tests/apply-io.test.ts
+  s_9adc5ae1d7c5ea::t_22062cc4ad67a2 1-305
+tests/apply-parser.test.ts
+  s_9adc5ae1d7c5ea::t_ea6ec980dc795b 1-114
+tests/apply-policy.test.ts
+  s_9adc5ae1d7c5ea::t_5ace563e2c75b6 1-382
+tests/apply-state.test.ts
+  s_9adc5ae1d7c5ea::t_651c93d3a9d1da 1-176
+tests/apply-tool.test.ts
+  s_9adc5ae1d7c5ea::t_69ced655fa4094 1-346
+tests/approval-state.test.ts
+  s_9adc5ae1d7c5ea::t_234ff974c8def0 1-160
+tests/approval-token.test.ts
+  s_9adc5ae1d7c5ea::t_cbb96ca4bc59e2 1-159
+tests/approval-tools.test.ts
+  s_9adc5ae1d7c5ea::t_be77a24df54a1c 1-182
+tests/auto-reply.test.ts
+  s_9adc5ae1d7c5ea::t_a876b422505496 1-91
+tests/backfill.test.ts
+  s_9adc5ae1d7c5ea::t_9b71bec65b6dd2 1-114
+tests/canonical.test.ts
+  s_9adc5ae1d7c5ea::t_bc0630545e5283 1-53
+tests/capability.test.ts
+  s_9adc5ae1d7c5ea::t_fb30adf807c97d 1-30
+tests/collector.test.ts
+  s_9adc5ae1d7c5ea::t_f35cec2b8867f8 1-168
+tests/email-sender.test.ts
+  s_9adc5ae1d7c5ea::t_24dde4964802c0 1-140
+tests/envelope.test.ts
+  s_9adc5ae1d7c5ea::t_30ac5702b257dc 1-56
+tests/helpers/fake-r2.ts
+  s_9adc5ae1d7c5ea::t_c8fbcce96293d4 1-60
+tests/helpers/fixtures.ts
+  s_9adc5ae1d7c5ea::t_a0aa4b0b0d969e 1-109
+tests/html-escaping-regression.test.ts
+  s_9adc5ae1d7c5ea::t_c42d9ca7ffc5be 1-70
+tests/inbound-zone-binding.test.ts
+  s_9adc5ae1d7c5ea::t_11709409f9811b 1-159
+tests/inbound.test.ts
+  s_9adc5ae1d7c5ea::t_fd3daed4d6cc98 1-275
+tests/monitor-endday.test.ts
+  s_9adc5ae1d7c5ea::t_c0e4e9b8caae3e 1-81
+tests/monitor-tool.test.ts
+  s_9adc5ae1d7c5ea::t_6d54d1a9cc0c5c 1-233
+tests/monitor.test.ts
+  s_9adc5ae1d7c5ea::t_a750607a2f424b 1-302
+tests/outcome-storage.test.ts
+  s_9adc5ae1d7c5ea::t_31fca3a48b609b 1-90
+tests/reader.test.ts
+  s_9adc5ae1d7c5ea::t_91e6d9e2f17412 1-74
+tests/recommendation.test.ts
+  s_9adc5ae1d7c5ea::t_80d25e27294af2 1-207
+tests/report.test.ts
+  s_9adc5ae1d7c5ea::t_1e7afcae41e527 1-172
+tests/rollback.test.ts
+  s_9adc5ae1d7c5ea::t_b47dc58cee7d61 1-227
+tests/sanitization.test.ts
+  s_9adc5ae1d7c5ea::t_cd624532f9a359 1-46
+tests/send.test.ts
+  s_9adc5ae1d7c5ea::t_6999d72de88ec5 1-31
+tests/storage.test.ts
+  s_9adc5ae1d7c5ea::t_d0a45e0f812690 1-116
+tests/tools.test.ts
+  s_9adc5ae1d7c5ea::t_898355a1f54ba8 1-90
+tsconfig.json
+  s_9adc5ae1d7c5ea::t_6dfff9114fc97e 6,19
+vite.config.ts
+  s_9adc5ae1d7c5ea::t_1993a5ca60d40d 1-10
+vitest.config.ts
+  s_9adc5ae1d7c5ea::t_763d1492e23bcd 1-8
+worker-configuration.d.ts
+  s_9adc5ae1d7c5ea::t_2ede0e34e91b61 2-3,5-8,10-12,18-23
+wrangler.jsonc
+  s_9adc5ae1d7c5ea::t_6f1f18d546a0c7 6-66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "86ec7d07e083d19d8ac942616373b1cc44de86e1",
+  "prompts": {},
+  "sessions": {
+    "s_9adc5ae1d7c5ea": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_ff0a42ab7ffeBFnscbvYbIdCO1",
+        "model": "@cf/deepseek-ai/deepseek-v4-flash-0731"
+      },
+      "human_author": "Harshil Agrawal <harshil@cloudflare.com>"
+    },
+    "s_b43f0b61db89dd": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_ff0d62e0fffeFedf1XG57juc69",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Harshil Agrawal <harshil@cloudflare.com>"
+    }
+  }
+}
