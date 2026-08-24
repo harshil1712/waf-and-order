@@ -40,18 +40,18 @@ The button clones this repository into your GitHub account, configures Workers
 Builds, provisions the declared D1 database, R2 bucket, Workers AI binding and
 Durable Object, applies the D1 migrations, and deploys the Worker.
 
-After the deployment completes:
+During deployment, enable the **Cloudflare Access** toggle and use the
+`TEAM_DOMAIN` and `POLICY_AUD` values it shows. After deployment:
 
-1. Complete the [external onboarding](#external-onboarding) for Cloudflare
-   Access and email.
-2. Add the required [secrets](#secrets). Leave `WAF_WRITE_TOKEN` unset for an
+1. Complete the [email onboarding](#access-and-email-onboarding).
+2. Confirm the required [secrets](#secrets). Leave `WAF_WRITE_TOKEN` unset for an
    initial read-only rollout.
 3. [Register at least one zone in D1](#zones-in-d1).
 4. Open `/health` on the deployed Worker to verify it is running.
 
-The Deploy button prompts for exactly five values: `CLOUDFLARE_READ_TOKEN`,
-`APPROVAL_TOKEN_SECRET`, `TEAM_DOMAIN`, `POLICY_AUD`, and
-`OPERATOR_ALLOWED_ORIGINS`. `WAF_WRITE_TOKEN` is added later through
+The Deploy button prompts for exactly four values: `CLOUDFLARE_READ_TOKEN`,
+`APPROVAL_TOKEN_SECRET`, `TEAM_DOMAIN`, and `POLICY_AUD`.
+`WAF_WRITE_TOKEN` is added later through
 `npx wrangler secret put WAF_WRITE_TOKEN` only if you enable guarded WAF
 writes.
 
@@ -82,13 +82,13 @@ npm run deploy
 deploy --minify`: it applies any new D1 migrations by binding name (`DB`),
 rebuilds, and deploys.
 
-### External onboarding
+### Access and email onboarding
 
-Two external steps are not covered by any deploy flow:
-
-- **Cloudflare Access** protects `/agents/*` and `/operator/*`. Create an Access
-  application for the Worker routes, then set `TEAM_DOMAIN` and `POLICY_AUD`.
-  These routes fail closed until both are set; `/health` stays open.
+- **Cloudflare Access** protects the Worker at the edge. Enable the deployment
+  form's Access toggle and use the `TEAM_DOMAIN` and `POLICY_AUD` values it
+  shows. `/agents/*` and `/operator/*` additionally fail closed in application
+  code until both are set. Because this Worker uses Static Assets, it validates
+  the `Cf-Access-Jwt-Assertion` header rather than relying on `ctx.access`.
 - **Email Routing and Email Sending** are external onboarding. Inbound approval
   requires a catch-all or plus-address routing rule to the Worker `email()`
   handler for each registered zone's report domain (the approval `Reply-To` is
@@ -110,7 +110,10 @@ are non-secret values in `wrangler.jsonc` (or `.dev.vars` for local dev).
 |---|---|---|---|
 | `TEAM_DOMAIN` | No | Empty: Access-protected routes reject all requests | Access team domain, e.g. `https://<your-team>.cloudflareaccess.com` |
 | `POLICY_AUD` | No | Empty: Access-protected routes reject all requests | Access application AUD tag |
-| `OPERATOR_ALLOWED_ORIGINS` | No | Empty: browser POST `Origin` must be same-origin with the request URL | Comma-separated allowed origins for operator POSTs; empty enforces same-origin, it does not disable enforcement |
+
+Browser POSTs to `/operator/rollback` must be same-origin; cross-origin
+requests are rejected. Requests with no `Origin` header are still allowed for
+non-browser API clients.
 
 ### Secrets
 
@@ -128,15 +131,16 @@ Secrets are never stored in D1.
 scheduled GraphQL analytics collector and as the bearer token for unattended
 access to `https://mcp.cloudflare.com/mcp`; the Worker does not run the
 interactive OAuth flow. The MCP connection exposes only the `search` tool and
-does not mount `execute`. Create a custom API token with:
+does not mount `execute`. In the current token builder, grant exactly:
 
-- **Zone > Zone > Read**
-- **Zone > Zone WAF > Read**
-- **Zone > Analytics > Read**
+- **All Domains > Zone Analytics > Read**
 
-Restrict the token's resources to the account and zones registered in this
-application. Do not grant write permissions. WAF writes use the separate
-`WAF_WRITE_TOKEN` secret and are never available to MCP or the model.
+Choose **All Domains** for the simplest multi-zone setup, or select only the
+domains registered in this application for tighter scoping. Do not choose
+**Entire Account**: this application queries the zone-scoped
+`httpRequestsAdaptiveGroups` dataset. No Zone WAF or write permission is needed.
+WAF writes use the separate `WAF_WRITE_TOKEN` secret and are never available to
+MCP or the model.
 
 ## Architecture
 
@@ -262,11 +266,10 @@ npm run cf-typegen
 npm run dev
 ```
 
-`TEAM_DOMAIN`, `POLICY_AUD`, and `OPERATOR_ALLOWED_ORIGINS` are non-secret
-wrangler vars declared in `wrangler.jsonc`. They are intentionally omitted
-from `.dev.vars.example` to avoid duplicate Deploy-button prompts, but you can
-still override them locally in your own `.dev.vars` file when running
-`npm run dev`.
+`TEAM_DOMAIN` and `POLICY_AUD` are non-secret wrangler vars declared in
+`wrangler.jsonc`. They are intentionally omitted from `.dev.vars.example` to
+avoid duplicate Deploy-button prompts, but you can still override them locally
+in your own `.dev.vars` file when running `npm run dev`.
 
 ## Test
 

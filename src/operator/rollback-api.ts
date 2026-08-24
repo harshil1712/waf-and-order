@@ -5,7 +5,7 @@
  * behind Cloudflare Access middleware and requires:
  *   - an exact `zoneId` + `recommendationId`;
  *   - an exact confirmation phrase (`ROLLBACK_CONFIRMATION_PHRASE`);
- *   - Origin validation for browser POSTs (when `allowedOrigins` configured);
+ *   - same-origin validation for browser POSTs (cross-origin rejected);
  *   - an append-only D1 audit row written BEFORE any dispatch.
  *
  * On success it dispatches an internal `waf.rollback.authorized` signal to the
@@ -43,8 +43,6 @@ export interface RollbackApiDeps {
   registryFor: (env: CloudflareBindings) => ZoneRegistryRepository;
   /** Dispatch the authorized rollback signal (injected for tests). */
   dispatchRollback: RollbackDispatcher;
-  /** Resolve allowed origins for browser POSTs from the request env. */
-  allowedOriginsFor: (env: CloudflareBindings) => string[];
   /** Injectable clock for deterministic audit timestamps. */
   now?: () => Date;
 }
@@ -59,24 +57,17 @@ export function sameOrigin(origin: string, requestUrl: string): boolean {
 }
 
 /**
- * CSRF Origin policy:
+ * CSRF Origin policy (hard-coded, no configurable allowlist):
  *   - A request with NO `Origin` header is allowed (non-browser API client; the
  *     Access JWT is still mandatory).
- *   - With an `Origin` header and an allowlist configured, the origin must match
- *     the allowlist.
- *   - With an `Origin` header and NO allowlist, the origin must be same-origin
- *     with the request URL. Arbitrary browser origins are never trusted when
- *     `OPERATOR_ALLOWED_ORIGINS` is empty.
+ *   - With an `Origin` header, the origin must be same-origin with the request
+ *     URL. Arbitrary cross-origin browser origins are always rejected.
  */
 export function isAllowedOrigin(
   origin: string | undefined,
-  allowedOrigins: string[] | undefined,
   requestUrl: string,
 ): boolean {
   if (!origin) return true;
-  if (allowedOrigins && allowedOrigins.length > 0) {
-    return allowedOrigins.includes(origin);
-  }
   return sameOrigin(origin, requestUrl);
 }
 
@@ -106,7 +97,7 @@ export function createOperatorApi(deps: RollbackApiDeps): Hono<{ Bindings: Cloud
     ).get("operator") as VerifiedOperator | undefined;
 
     // Origin validation for browser POSTs (defense against CSRF).
-    if (!isAllowedOrigin(c.req.header("Origin"), deps.allowedOriginsFor(c.env), c.req.url)) {
+    if (!isAllowedOrigin(c.req.header("Origin"), c.req.url)) {
       return c.json({ error: "origin_not_allowed" }, 403);
     }
 

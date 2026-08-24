@@ -138,7 +138,6 @@ describe("markRolledBack lifecycle", () => {
 describe("operator rollback API", () => {
   function buildApp(opts: {
     zones?: ReturnType<typeof zoneRowForTest>[];
-    allowedOrigins?: string[];
     dispatch?: (a: unknown) => Promise<void>;
   } = {}) {
     const db = new FakeD1(opts.zones ?? [zoneRowForTest("zone-a", "a.example.com")]);
@@ -155,7 +154,6 @@ describe("operator rollback API", () => {
       "/operator",
       createOperatorApi({
         registryFor: () => repo,
-        allowedOriginsFor: () => opts.allowedOrigins ?? [],
         dispatchRollback,
         now: () => NOW,
       }),
@@ -235,8 +233,8 @@ describe("operator rollback API", () => {
     expect(dispatchRollback).not.toHaveBeenCalled();
   });
 
-  it("enforces an allowed-origin allowlist for browser POSTs", async () => {
-    const { app, dispatchRollback } = buildApp({ allowedOrigins: ["https://ops.example.com"] });
+  it("accepts same-origin browser POSTs and rejects cross-origin POSTs", async () => {
+    const { app, dispatchRollback } = buildApp();
     const good = await app.request("https://ops.example.com/operator/rollback", {
       method: "POST",
       headers: { "content-type": "application/json", origin: "https://ops.example.com" },
@@ -253,29 +251,19 @@ describe("operator rollback API", () => {
     expect(dispatchRollback).toHaveBeenCalledTimes(1);
   });
 
-  it("requires same-origin when no allowlist is configured", async () => {
-    const { app, dispatchRollback } = buildApp(); // allowedOrigins: []
-    // Same-origin with the request URL → allowed.
-    const good = await app.request("https://ops.example.com/operator/rollback", {
+  it("accepts POSTs with no Origin header (non-browser API client)", async () => {
+    const { app, dispatchRollback } = buildApp();
+    const res = await app.request("https://ops.example.com/operator/rollback", {
       method: "POST",
-      headers: { "content-type": "application/json", origin: "https://ops.example.com" },
+      headers: { "content-type": "application/json" },
       body: POST("zone-a", "R-1", ROLLBACK_CONFIRMATION_PHRASE),
     });
-    expect(good.status).toBe(202);
-
-    // Cross-origin (arbitrary browser origin) → rejected even without an allowlist.
-    const bad = await app.request("https://ops.example.com/operator/rollback", {
-      method: "POST",
-      headers: { "content-type": "application/json", origin: "https://evil.example.com" },
-      body: POST("zone-a", "R-1", ROLLBACK_CONFIRMATION_PHRASE),
-    });
-    expect(bad.status).toBe(403);
+    expect(res.status).toBe(202);
     expect(dispatchRollback).toHaveBeenCalledTimes(1);
   });
 
-  it("isAllowedOrigin permits a request with no Origin header (API client)", () => {
-    expect(isAllowedOrigin(undefined, [], "https://x.example/operator/rollback")).toBe(true);
-    expect(isAllowedOrigin(undefined, ["https://a.example"], "https://x.example/operator/rollback")).toBe(true);
+  it("isAllowedOrigin permits a request with no Origin header", () => {
+    expect(isAllowedOrigin(undefined, "https://x.example/operator/rollback")).toBe(true);
   });
 
   it("sameOrigin compares scheme+host+port", () => {

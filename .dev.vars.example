@@ -6,9 +6,9 @@
 # It is a WORKER SECRET, never a wrangler var: set it in production with
 #   npx wrangler secret put CLOUDFLARE_READ_TOKEN
 # For local dev, replace the placeholder below.
-# Required permissions: Zone > Zone > Read, Zone > Zone WAF > Read,
-# Zone > Analytics > Read. Restrict the token to the account and zones
-# registered in this application. Do not grant any write permissions.
+# Required permission: All Domains > Zone Analytics > Read. Scope it to all
+# domains for multi-zone use, or only the domains registered in this
+# application. Do not grant any write permissions.
 CLOUDFLARE_READ_TOKEN="replace-with-a-read-only-cloudflare-api-token"
 
 # Approval workflow

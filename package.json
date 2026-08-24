@@ -42,16 +42,13 @@
         "description": "R2 bucket containing zone-keyed traffic rollups and monitoring outcomes."
       },
       "TEAM_DOMAIN": {
-        "description": "Your Cloudflare Access team domain, for example `https://your-team.cloudflareaccess.com`."
+        "description": "The team domain shown when you enable the deployment form's Cloudflare Access toggle, for example `https://your-team.cloudflareaccess.com`."
       },
       "POLICY_AUD": {
-        "description": "The AUD tag for the Cloudflare Access application protecting this Worker."
-      },
-      "OPERATOR_ALLOWED_ORIGINS": {
-        "description": "Optional comma-separated browser origins allowed to submit rollback confirmations. Empty defaults to same-origin only."
+        "description": "The application AUD tag shown when you enable the deployment form's Cloudflare Access toggle."
       },
       "CLOUDFLARE_READ_TOKEN": {
-        "description": "Read-only Cloudflare API token used by scheduled GraphQL analytics collection and the model-facing MCP search connection (search only, never execute). Permissions: Zone > Zone > Read, Zone > Zone WAF > Read, Zone > Analytics > Read, restricted to registered zones/account. Do not grant write permissions."
+        "description": "Read-only Cloudflare API token used by scheduled GraphQL analytics collection and the model-facing MCP search connection (search only, never execute). Permission: All Domains > Zone Analytics > Read. Scope it to all domains for multi-zone use, or only the registered domains. Do not grant write permissions."
       },
       "APPROVAL_TOKEN_SECRET": {
         "description": "A long random cryptographic secret used to sign single-use email approval tokens. Not a Cloudflare API token. Generate one with `openssl rand -hex 32`."

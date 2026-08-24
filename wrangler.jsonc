@@ -9,7 +9,6 @@
   "vars": {
     "TEAM_DOMAIN": "",
     "POLICY_AUD": "",
-    "OPERATOR_ALLOWED_ORIGINS": "",
   },
   "send_email": [
     {

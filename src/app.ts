@@ -22,16 +22,6 @@ function accessConfig(env: CloudflareBindings): AccessConfig {
   };
 }
 
-/** Allowed operator origins for browser POSTs (comma-separated env var). */
-function allowedOrigins(env: CloudflareBindings): string[] {
-  const raw = String(env.OPERATOR_ALLOWED_ORIGINS ?? "");
-  if (!raw) return [];
-  return raw
-    .split(",")
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
-}
-
 /** Hono middleware that enforces Access with env-resolved config. */
 function requireAccess(): (c: import("hono").Context, next: import("hono").Next) => Promise<Response | void> {
   return (c, next) => accessMiddleware(accessConfig(c.env))(c, next);
@@ -69,7 +59,6 @@ app.route(
   "/operator",
   createOperatorApi({
     registryFor: (env) => new ZoneRegistryRepository(env.DB),
-    allowedOriginsFor: (env) => allowedOrigins(env),
     dispatchRollback: async (attributes) => {
       await dispatch(ZoneBotAnalyst, {
         id: CONTROL_PLANE_CONVERSATION_ID,
