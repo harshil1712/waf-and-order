@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   createRecommendation,
@@ -87,6 +87,14 @@ describe("payload hash", () => {
 });
 
 describe("createRecommendation (immutability)", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-08-15T00:00:00Z"));
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("derives mutationId and payloadHash deterministically", () => {
     const r1 = createRecommendation(baseInput());
     const r2 = createRecommendation(baseInput());
@@ -133,6 +141,14 @@ describe("createRecommendation (immutability)", () => {
 });
 
 describe("deterministic validation / risk policy", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-08-15T00:00:00Z"));
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("accepts a valid bounded medium-risk recommendation", () => {
     const r = createRecommendation(baseInput());
     expect(r.risk).toBe("medium");

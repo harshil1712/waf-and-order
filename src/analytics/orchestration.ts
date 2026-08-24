@@ -31,11 +31,11 @@ export interface CollectionRun {
   backfilledDays: string[];
 }
 
-/** The analytics token is read from the Worker secret at run time. */
+/** The shared read-only Cloudflare token is read from the Worker secret at run time. */
 function analyticsToken(): string {
-  const token = process.env.CLOUDFLARE_ANALYTICS_TOKEN;
+  const token = process.env.CLOUDFLARE_READ_TOKEN;
   if (!token) {
-    throw new Error("CLOUDFLARE_ANALYTICS_TOKEN is not set; cannot collect analytics.");
+    throw new Error("CLOUDFLARE_READ_TOKEN is not set; cannot collect analytics.");
   }
   return token;
 }

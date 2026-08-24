@@ -1,11 +1,10 @@
 /**
  * Direct deterministic GraphQL Analytics client.
  *
- * The collector talks directly to the GraphQL Analytics API using a
- * narrowly scoped read-only token (`CLOUDFLARE_ANALYTICS_TOKEN`). This is
- * deterministic code owned by the scheduled handler, not model-reinvented
- * collection: the pipeline must not depend on the model
- * reinventing the core collection query every day.
+ * The collector talks directly to the GraphQL Analytics API using the shared
+ * read-only token (`CLOUDFLARE_READ_TOKEN`). This is deterministic code owned
+ * by the scheduled handler, not model-reinvented collection: the pipeline must
+ * not depend on the model reinventing the core collection query every day.
  *
  * Query windows are capped at one day: `httpRequestsAdaptiveGroups`
  * on this plan limits each query to at most one day, so daily collection is

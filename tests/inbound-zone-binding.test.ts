@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { handleInboundEmail } from "../src/email/handler.ts";
 import { signToken, TOKEN_VERSION } from "../src/shared/approval-token.ts";
@@ -14,6 +14,11 @@ const ALLOWED = ["approver@example.com"];
 
 const NOW = new Date("2026-08-15T00:00:00Z");
 const EXPIRES = "2026-08-20T00:00:00Z";
+
+function useFixedApprovalTime() {
+  vi.useFakeTimers();
+  vi.setSystemTime(NOW);
+}
 
 function tokenPayload(zoneId: string) {
   return {
@@ -63,7 +68,11 @@ async function dispatchTarget() {
 }
 
 describe("inbound email zone binding (no global target zone)", () => {
+  beforeEach(() => {
+    useFixedApprovalTime();
+  });
   afterEach(() => {
+    vi.useRealTimers();
     delete process.env.APPROVAL_TOKEN_SECRET;
   });
 

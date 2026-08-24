@@ -1,5 +1,3 @@
-import { timingSafeEqual } from "node:crypto";
-
 import { createAgentRouter } from "@flue/runtime/routing";
 import { dispatch } from "@flue/runtime";
 import { Hono } from "hono";
@@ -40,22 +38,13 @@ function requireAccess(): (c: import("hono").Context, next: import("hono").Next)
 }
 
 /**
- * Agent mount, protected by Cloudflare Access. The shared control-plane agent
- * lives at the single `control-plane` conversation id. `AGENT_ACCESS_TOKEN`
- * remains as defense-in-depth (when set) in addition to Access.
+ * Agent mount, protected by Cloudflare Access only. The shared control-plane
+ * agent lives at the single `control-plane` conversation id. Access remains the
+ * sole protection for agent/operator routes and fails closed without
+ * TEAM_DOMAIN/POLICY_AUD.
  */
 app.use("/agents/zone-bot-analyst/*", requireAccess());
 app.use("/agents/zone-bot-analyst/*", async (context, next) => {
-  // Defense-in-depth: the legacy bearer token (when configured).
-  const expectedToken = process.env.AGENT_ACCESS_TOKEN;
-  const authorization = context.req.header("Authorization");
-  const suppliedToken = authorization?.startsWith("Bearer ")
-    ? authorization.slice("Bearer ".length)
-    : undefined;
-  if (expectedToken && (!suppliedToken || !tokensMatch(expectedToken, suppliedToken))) {
-    return context.json({ error: "unauthorized" }, 401);
-  }
-
   // Only the shared control-plane conversation is exposed here.
   const conversationId = context.req.path
     .slice("/agents/zone-bot-analyst/".length)
@@ -99,15 +88,5 @@ app.route(
     },
   }),
 );
-
-function tokensMatch(expected: string, supplied: string): boolean {
-  const expectedBytes = Buffer.from(expected);
-  const suppliedBytes = Buffer.from(supplied);
-
-  return (
-    expectedBytes.length === suppliedBytes.length &&
-    timingSafeEqual(expectedBytes, suppliedBytes)
-  );
-}
 
 export default app;

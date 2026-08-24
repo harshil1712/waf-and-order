@@ -49,6 +49,12 @@ After the deployment completes:
 3. [Register at least one zone in D1](#zones-in-d1).
 4. Open `/health` on the deployed Worker to verify it is running.
 
+The Deploy button prompts for exactly five values: `CLOUDFLARE_READ_TOKEN`,
+`APPROVAL_TOKEN_SECRET`, `TEAM_DOMAIN`, `POLICY_AUD`, and
+`OPERATOR_ALLOWED_ORIGINS`. `WAF_WRITE_TOKEN` is added later through
+`npx wrangler secret put WAF_WRITE_TOKEN` only if you enable guarded WAF
+writes.
+
 ### First-time manual setup (clean account)
 
 From a clone of this repository:
@@ -110,30 +116,27 @@ are non-secret values in `wrangler.jsonc` (or `.dev.vars` for local dev).
 
 | Secret | Required | Fails closed when | Notes |
 |---|---|---|---|
-| `CLOUDFLARE_ANALYTICS_TOKEN` | Yes for collection | Absent: daily collection errors | Read-only token with GraphQL Analytics access |
-| `APPROVAL_TOKEN_SECRET` | Yes for approvals | Absent: token signing and verification fail | Long random secret, e.g. `openssl rand -hex 32`; signs single-use approval tokens |
-| `WAF_WRITE_TOKEN` | No | Absent: apply tool not mounted, rollback fails closed | Account-wide write token used only by the application-owned Rulesets client; omit for read-only rollout |
-| `CLOUDFLARE_MCP_TOKEN` | No | Absent: model-facing MCP connection unavailable | Read-only Cloudflare token for the model-facing connection |
-| `AGENT_ACCESS_TOKEN` | No | Absent: bearer check skipped | Defense-in-depth bearer on the agent route behind Access |
+| `CLOUDFLARE_READ_TOKEN` | Yes for collection and MCP | Absent: daily collection errors; MCP connection unavailable | Read-only Cloudflare API token shared by scheduled GraphQL analytics collection and the model-facing MCP search connection |
+| `APPROVAL_TOKEN_SECRET` | Yes for approvals | Absent: token signing and verification fail | Long random cryptographic secret, e.g. `openssl rand -hex 32`; signs single-use approval tokens. Not a Cloudflare API token |
+| `WAF_WRITE_TOKEN` | No | Absent: apply tool not mounted, rollback fails closed | Account-wide write token used only by the application-owned Rulesets client; add post-deploy with `npx wrangler secret put WAF_WRITE_TOKEN` if enabling writes |
 
 Secrets are never stored in D1.
 
-#### Cloudflare MCP token permissions
+#### Cloudflare read token permissions
 
-`CLOUDFLARE_MCP_TOKEN` is optional. It is a Cloudflare API token used as a
-bearer token for unattended access to `https://mcp.cloudflare.com/mcp`; the
-Worker does not run the interactive OAuth flow. The MCP connection exposes only
-the `search` tool and does not mount `execute`. There is no MCP-specific API
-token permission. For this application's read-only MCP access, create a custom
-token with:
+`CLOUDFLARE_READ_TOKEN` is read-only. It is used both by the deterministic
+scheduled GraphQL analytics collector and as the bearer token for unattended
+access to `https://mcp.cloudflare.com/mcp`; the Worker does not run the
+interactive OAuth flow. The MCP connection exposes only the `search` tool and
+does not mount `execute`. Create a custom API token with:
 
 - **Zone > Zone > Read**
 - **Zone > Zone WAF > Read**
+- **Zone > Analytics > Read**
 
-Restrict the token's resources to only the account and zones registered in this
-application. Add **Zone > Analytics > Read** only if you also want the MCP
-connection to search analytics capabilities; scheduled collection uses the
-separate `CLOUDFLARE_ANALYTICS_TOKEN`. Do not grant write permissions.
+Restrict the token's resources to the account and zones registered in this
+application. Do not grant write permissions. WAF writes use the separate
+`WAF_WRITE_TOKEN` secret and are never available to MCP or the model.
 
 ## Architecture
 
@@ -243,6 +246,9 @@ model can never trigger rollback.
 - Every credential-gated path fails closed. Access-protected routes reject when
   `TEAM_DOMAIN` or `POLICY_AUD` is unset; sends throw when Email Sending is
   unprovisioned; apply and rollback fail closed without `WAF_WRITE_TOKEN`.
+- The model-facing MCP connection mounts `search` only and never executes
+  mutations. WAF writes remain application-owned, bound to the separate
+  `WAF_WRITE_TOKEN` secret, and are never exposed to MCP or the model.
 - No live WAF write, email send, D1 mutation or deployment is performed by
   tests. Email Sending is not onboarded and no live integration was tested.
 
@@ -255,6 +261,12 @@ npx wrangler d1 migrations apply DB --local
 npm run cf-typegen
 npm run dev
 ```
+
+`TEAM_DOMAIN`, `POLICY_AUD`, and `OPERATOR_ALLOWED_ORIGINS` are non-secret
+wrangler vars declared in `wrangler.jsonc`. They are intentionally omitted
+from `.dev.vars.example` to avoid duplicate Deploy-button prompts, but you can
+still override them locally in your own `.dev.vars` file when running
+`npm run dev`.
 
 ## Test
 

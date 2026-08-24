@@ -245,7 +245,11 @@ export function ZoneBotAnalyst({ id }: AgentProps) {
     }
   });
 
-  const mcpToken = process.env.CLOUDFLARE_MCP_TOKEN;
+  // Model-facing MCP search connection. It mounts search only and never
+  // executes mutations; the same read-only CLOUDFLARE_READ_TOKEN used by
+  // scheduled collection is reused here. WAF writes remain bound to the separate
+  // WAF_WRITE_TOKEN secret and are never exposed to MCP.
+  const mcpToken = process.env.CLOUDFLARE_READ_TOKEN;
   if (mcpToken) {
     useMcpConnection({
       name: "cloudflare",

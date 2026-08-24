@@ -1,50 +1,23 @@
-CLOUDFLARE_MCP_TOKEN="replace-with-a-read-only-cloudflare-api-token"
-AGENT_ACCESS_TOKEN="replace-with-a-long-random-token"
-CLOUDFLARE_ANALYTICS_TOKEN="replace-with-a-read-only-graphql-analytics-token"
-
-# Guarded WAF application
+# Shared read-only Cloudflare API token
 # ------------------------------------------------------------------
-# WAF_WRITE_TOKEN is the APPLICATION-OWNED write credential, separate from the
-# read-only MCP token. It is used ONLY by the deterministic Rulesets client that
-# POSTs a single zone rule; it is NEVER available to the model's MCP connection.
-# It is a WORKER SECRET, never a wrangler var: set it with
-#   npx wrangler secret put WAF_WRITE_TOKEN
-# For local dev, set it here in .dev.vars (replace with a zone-scoped API token
-# that can only create rules in the target zone's custom ruleset).
-# When unset, the apply tool is NOT mounted (defense in depth).
-WAF_WRITE_TOKEN="replace-with-a-zone-scoped-waf-write-token"
+# CLOUDFLARE_READ_TOKEN is used by:
+#   - the deterministic scheduled GraphQL analytics collector, and
+#   - the model-facing MCP search connection (search only — never execute).
+# It is a WORKER SECRET, never a wrangler var: set it in production with
+#   npx wrangler secret put CLOUDFLARE_READ_TOKEN
+# For local dev, replace the placeholder below.
+# Required permissions: Zone > Zone > Read, Zone > Zone WAF > Read,
+# Zone > Analytics > Read. Restrict the token to the account and zones
+# registered in this application. Do not grant any write permissions.
+CLOUDFLARE_READ_TOKEN="replace-with-a-read-only-cloudflare-api-token"
 
 # Approval workflow
 # ------------------------------------------------------------------
 # APPROVAL_TOKEN_SECRET signs the expiring, single-use approval reply tokens.
-# It is a WORKER SECRET, never a wrangler var: set it with
+# It is a WORKER SECRET and a cryptographic secret (not a Cloudflare API token),
+# never a wrangler var: set it in production with
 #   npx wrangler secret put APPROVAL_TOKEN_SECRET
 # For local dev, set it here in .dev.vars (replace the placeholder with a long
 # random value, e.g. `openssl rand -hex 32`). The agent and the email handler
 # read it via process.env.APPROVAL_TOKEN_SECRET and fail closed when unset.
 APPROVAL_TOKEN_SECRET="replace-with-a-long-random-secret"
-
-# Cloudflare Access (operator/control-plane routes)
-# ------------------------------------------------------------------
-# TEAM_DOMAIN is the Access team domain, e.g.
-#   https://<your-team>.cloudflareaccess.com
-# POLICY_AUD is the Access application's AUD tag. Together they drive official
-# remote-JWKS validation of the Cf-Access-Jwt-Assertion header (jose). These are
-# NON-SECRET vars (set in wrangler.jsonc or .dev.vars for local dev). Operator
-# routes FAIL CLOSED when either is absent.
-TEAM_DOMAIN="https://<your-team>.cloudflareaccess.com"
-POLICY_AUD="replace-with-your-access-aud-tag"
-
-# Allowed Origin(s) for browser POSTs to the operator rollback API. Comma-
-# separated. When set, browser POST Origin is enforced against this allowlist.
-# Leave empty to enforce same-origin browser requests.
-OPERATOR_ALLOWED_ORIGINS=""
-
-# D1 zone registry
-# ------------------------------------------------------------------
-# The DB binding omits database_id so Wrangler/Deploy to Cloudflare can
-# provision it automatically. Apply local migrations with:
-#   npx wrangler d1 migrations apply DB --local
-# The authoritative zone config (hostname, ruleset, envelope senders, report
-# addresses) lives in the D1 `zones` table. New installs start empty; add zones
-# there rather than via env vars.
