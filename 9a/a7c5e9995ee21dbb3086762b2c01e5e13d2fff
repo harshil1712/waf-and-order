@@ -1,0 +1,41 @@
+README.md
+  s_7e4d5b90fabb6e::t_5cdcd608700a19 43-44,46-47,52-54,85,87-91,113-116,134,136,138-143,269-272
+src/operator/rollback-api.ts
+  s_0222beaeb4abd4::t_20f751f0a906f6 8,60,63-64,100
+tests/operator-rollback.test.ts
+  s_0222beaeb4abd4::t_9de0864146b693 236-237,254-256,258,261,265-266
+worker-configuration.d.ts
+  s_09adceafa84cb9::t_70744680e0caf9 2,21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "9aa7c5e9995ee21dbb3086762b2c01e5e13d2fff",
+  "prompts": {},
+  "sessions": {
+    "s_0222beaeb4abd4": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_fcb69edd0ffeGyzou0husvmsqW",
+        "model": "@cf/moonshotai/kimi-k2.7-code"
+      },
+      "human_author": "Harshil Agrawal <harshil@cloudflare.com>"
+    },
+    "s_09adceafa84cb9": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_fcb6bb47fffeYgql83NH4vPWPH",
+        "model": "@cf/moonshotai/kimi-k2.7-code"
+      },
+      "human_author": "Harshil Agrawal <harshil@cloudflare.com>"
+    },
+    "s_7e4d5b90fabb6e": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_fcb9c5191ffeyHd9RfCQchsrA3",
+        "model": "@cf/moonshotai/kimi-k2.7-code"
+      },
+      "human_author": "Harshil Agrawal <harshil@cloudflare.com>"
+    }
+  }
+}
