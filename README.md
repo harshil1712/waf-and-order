@@ -1,9 +1,6 @@
 # WAF and Order
 
-<!-- TODO: Restore the Deploy to Cloudflare button once this repository has a
-     verified public URL (see "Deploy to Cloudflare" below). The old button
-     pointed at an unverified repository, so it was removed rather than left
-     silently mispointed. -->
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/harshil1712/waf-and-order)
 
 WAF and Order is a multi-zone bot-traffic analyst for a single Cloudflare
 account. It collects daily GraphQL analytics into zone-keyed R2 rollups, sends
@@ -35,6 +32,23 @@ single Access app, and one account-wide `WAF_WRITE_TOKEN`.
 
 ## Deploy
 
+### Deploy to Cloudflare (recommended)
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/harshil1712/waf-and-order)
+
+The button clones this repository into your GitHub account, configures Workers
+Builds, provisions the declared D1 database, R2 bucket, Workers AI binding and
+Durable Object, applies the D1 migrations, and deploys the Worker.
+
+After the deployment completes:
+
+1. Complete the [external onboarding](#external-onboarding) for Cloudflare
+   Access and email.
+2. Add the required [secrets](#secrets). Leave `WAF_WRITE_TOKEN` unset for an
+   initial read-only rollout.
+3. [Register at least one zone in D1](#zones-in-d1).
+4. Open `/health` on the deployed Worker to verify it is running.
+
 ### First-time manual setup (clean account)
 
 From a clone of this repository:
@@ -61,15 +75,6 @@ npm run deploy
 `npm run deploy` is `npm run db:migrations:apply && vite build && wrangler
 deploy --minify`: it applies any new D1 migrations by binding name (`DB`),
 rebuilds, and deploys.
-
-### Deploy to Cloudflare (one-click)
-
-Once this repository has a verified public URL, the one-click button can be
-restored. It clones the repo into your account, pre-provisions the declared
-resources (D1, R2, Workers AI, Durable Objects), then runs `npm run build` and
-`npm run deploy`. Because `deploy` applies D1 migrations by binding name, they
-run against the database the button just provisioned. Generate the button from
-the Worker dashboard after the public repository is connected.
 
 ### External onboarding
 
