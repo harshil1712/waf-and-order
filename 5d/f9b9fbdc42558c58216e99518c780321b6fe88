@@ -1,0 +1,19 @@
+.dev.vars.example
+  s_8e64bc274932a6::t_02cbd4335a51df 1,3-12,17-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "5df9b9fbdc42558c58216e99518c780321b6fe88",
+  "prompts": {},
+  "sessions": {
+    "s_8e64bc274932a6": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_fcbf445adffeNDieNIg7B09fwX",
+        "model": "@cf/moonshotai/kimi-k2.7-code"
+      },
+      "human_author": "Harshil Agrawal <harshil@cloudflare.com>"
+    }
+  }
+}
